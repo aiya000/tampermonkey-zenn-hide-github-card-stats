@@ -1,11 +1,10 @@
 // ==UserScript==
 // @name         Zenn - Hide GitHub Card Stats
 // @namespace    https://github.com/aiya000/tampermonkey-zenn-hide-github-card-stats
-// @version      1.0.0
+// @version      1.0.1
 // @description  Hides the star count and fork count on GitHub repository cards embedded in Zenn articles.
 // @author       aiya000
-// @match        https://zenn.dev/*
-// @match        https://embed.zenn.studio/*
+// @match        https://embed.zenn.studio/card*
 // @grant        none
 // @run-at       document-idle
 // ==/UserScript==
@@ -22,20 +21,14 @@
   const countTextPattern = /^[\d,.]+\s*[kKmM]?$/
 
   /**
-   * Zenn renders a GitHub card inside an iframe served from `embed.zenn.studio`.
-   * The script therefore runs in two places:
-   *   - inside the iframe (`embed.zenn.studio/github...`) → the whole document is the card
-   *   - on `zenn.dev` → only the GitHub card containers, in case a card is rendered inline
-   *
-   * The scope is kept this narrow so that other counts on `zenn.dev`
-   * (e.g. the number of likes) stay untouched.
+   * Zenn renders a GitHub repository card inside an iframe served from `embed.zenn.studio/card`.
+   * That iframe is shared with the link cards of any other site, so only the link to
+   * `github.com` is treated as a card.
+   * (`embed.zenn.studio/github` is the embed of a GitHub file, which has no stats.)
    * @returns {Element[]}
    */
   function findCardRoots() {
-    if (location.hostname === 'embed.zenn.studio') {
-      return location.pathname.startsWith('/github') ? [document.documentElement] : []
-    }
-    return Array.from(document.querySelectorAll('.zenn-embedded-github'))
+    return Array.from(document.querySelectorAll('a[href^="https://github.com/"]'))
   }
 
   function injectStyles() {
@@ -108,7 +101,7 @@
   }
 
   /**
-   * Both the card and the article are rendered client-side, and `zenn.dev` is an SPA,
+   * The card is rendered client-side after the iframe receives its URL from the article,
    * so the stats are hidden again whenever the DOM changes.
    * `hideAllStats` is idempotent, so redundant calls are harmless.
    */

@@ -7,12 +7,13 @@ A tampermonkey script that hides the star count and fork count on GitHub reposit
 - The ☆ star count and the fork count are hidden
 - Everything else on the card (the repository name, the description, the language) stays as it is
 
-Zenn renders a GitHub card inside an iframe served from `embed.zenn.studio`, so the script runs inside that iframe.
+Zenn renders a GitHub repository card inside an iframe served from `embed.zenn.studio/card`, so the script runs inside that iframe.
+The same iframe is used for the link cards of other sites, so only the link to `github.com` is touched.
 The card's class names are generated and not stable, so the script does not depend on them.
 Instead, it hides each item that consists of only an icon (`<svg>`) and a count (`515`, `4,100`, `4.1k`, ...).
 The language item (e.g. `Lua`) is not a count, so it is kept.
 
-A `MutationObserver` re-applies this whenever the DOM changes, so client-side rendering and SPA navigation are covered.
+A `MutationObserver` re-applies this whenever the DOM changes, so the card is covered even though it is rendered client-side.
 
 ## Installation
 
@@ -21,8 +22,7 @@ A `MutationObserver` re-applies this whenever the DOM changes, so client-side re
 
 ## Supported URLs
 
-- `https://embed.zenn.studio/github*` (the iframe of a GitHub card)
-- `https://zenn.dev/*` (only inside `.zenn-embedded-github`, in case a card is rendered inline)
+- `https://embed.zenn.studio/card*` (the iframe of a link card, including a GitHub repository card)
 
 ## Development
 
